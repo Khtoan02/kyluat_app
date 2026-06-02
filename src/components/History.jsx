@@ -10,7 +10,7 @@ export default function History({ history }) {
       <div className="hist-title">7 ngày gần nhất</div>
       {history.map(({ date, checkins }) => {
         const score = calcDayScore(SLOTS, checkins)
-        const color = score === 100 ? '#4ade80' : score >= 70 ? '#facc15' : score >= 40 ? '#fb923c' : '#f87171'
+        const color = score === 100 ? '#10b981' : score >= 70 ? '#f59e0b' : score >= 40 ? '#f97316' : '#ef4444'
         return (
           <div key={date} className="hist-row">
             <span className="hist-date">{formatDateVi(date)}</span>

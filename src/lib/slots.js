@@ -16,7 +16,7 @@ export const BUFFER_MIN = 5
 export function getRemoteCompany(dateStr) {
   const d = new Date(dateStr + 'T12:00:00')
   const day = d.getDay() // 0=Sun,1=Mon,...,6=Sat
-  return [1, 3, 5].includes(day) ? 'A' : 'B'
+  return [1, 3, 5].includes(day) ? 'HacoLED' : 'TavaLED'
 }
 
 export function todayStr() {
