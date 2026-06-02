@@ -2,19 +2,24 @@ import { getSlotStatus, slotStartMinutes, formatTime, BUFFER_MIN } from '../lib/
 import { todayStr } from '../lib/slots'
 
 const STATUS_CONFIG = {
-  future:   { label: 'Sắp tới',   cls: 'future'   },
-  active:   { label: 'Đang diễn', cls: 'active'   },
-  on_time:  { label: 'Đúng giờ',  cls: 'on-time'  },
-  late:     { label: 'Trễ',       cls: 'late'      },
-  missed:   { label: 'Bỏ lỡ',    cls: 'missed'   },
+  future:      { label: 'Sắp tới',               cls: 'future'      },
+  active:      { label: 'Bạn đang làm cái này? 🤔', cls: 'active'      },
+  in_progress: { label: 'Đang thực hiện... ⚡',     cls: 'in-progress' },
+  on_time:     { label: 'Đúng giờ',              cls: 'on-time'     },
+  late:        { label: 'Trễ',                   cls: 'late'        },
+  missed:      { label: 'Bỏ lỡ',                 cls: 'missed'      },
 }
 
 export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompany }) {
-  const status = getSlotStatus(slot, checkin?.checked_at, dateStr)
+  const status = getSlotStatus(slot, checkin?.checked_at, dateStr, checkin?.status)
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.future
   const isToday = dateStr === todayStr()
-  const canCheck = isToday && (status === 'active' || status === 'future' || status === 'on_time' || status === 'late')
-  const isChecked = !!checkin?.checked_at
+  
+  // Can click/check if active, future, in_progress, or completed (to allow reset)
+  const canCheck = isToday && (status === 'active' || status === 'future' || status === 'on_time' || status === 'late' || status === 'in_progress')
+  
+  // Only completed checkins are considered "checked" (shows checkmark, score, delay text)
+  const isChecked = !!checkin?.checked_at && checkin?.status !== 'in_progress'
 
   let delayText = ''
   if (isChecked && checkin?.checked_at) {
@@ -32,7 +37,7 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
     ? formatTime(slot.startH, slot.startM)
     : `${formatTime(slot.startH, slot.startM)} – ${slot.endH === 0 && slot.endM === 0 ? '00:00' : formatTime(slot.endH, slot.endM)}`
 
-  // Score for this slot
+  // Score for this slot (only calculated and visible when completed)
   let score = null
   if (isChecked) {
     if (delayText === '✓ Đúng giờ') score = 100
@@ -47,7 +52,7 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
 
   return (
     <div
-      className={`slot-card ${cfg.cls} ${isChecked ? 'checked' : ''}`}
+      className={`slot-card ${cfg.cls} ${isChecked ? 'checked' : ''} ${status === 'in_progress' ? 'in-progress' : ''}`}
       onClick={() => canCheck && onToggle(slot.id)}
       role={canCheck ? 'button' : undefined}
       tabIndex={canCheck ? 0 : undefined}
@@ -65,6 +70,7 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
         )}
         <div className={`slot-badge ${cfg.cls}`}>{cfg.label}</div>
         {delayText && <div className="slot-delay">{delayText}</div>}
+        {status === 'in_progress' && <div className="slot-in-progress-icon">⚡</div>}
         {isChecked && <div className="slot-check">✓</div>}
       </div>
     </div>

@@ -38,14 +38,15 @@ export function slotEndMinutes(slot) {
 }
 
 // Returns slot status based on current time and check-in data
-// 'future' | 'active' | 'missed' | 'on_time' | 'late'
-export function getSlotStatus(slot, checkedAt, dateStr) {
+// 'future' | 'active' | 'missed' | 'on_time' | 'late' | 'in_progress'
+export function getSlotStatus(slot, checkedAt, dateStr, status) {
   const isToday = dateStr === todayStr()
   const now = nowMinutes()
   const start = slotStartMinutes(slot)
   const end = slotEndMinutes(slot)
 
   if (checkedAt) {
+    if (status === 'in_progress') return 'in_progress'
     const checkedTime = new Date(checkedAt)
     const checkedMin = checkedTime.getHours() * 60 + checkedTime.getMinutes()
     const delay = checkedMin - start
@@ -65,8 +66,8 @@ export function calcDayScore(slots, checkins) {
   let total = 0
   slots.forEach(slot => {
     const ci = checkins.find(c => c.slot_id === slot.id)
-    if (!ci || !ci.checked_at) return
-    const status = getSlotStatus(slot, ci.checked_at, ci.date)
+    if (!ci || !ci.checked_at || ci.status === 'in_progress') return
+    const status = getSlotStatus(slot, ci.checked_at, ci.date, ci.status)
     if (status === 'on_time') total += 100
     else if (status === 'late') {
       const checkedMin = new Date(ci.checked_at).getHours() * 60 + new Date(ci.checked_at).getMinutes()

@@ -482,6 +482,31 @@ body {
   50% { border-color: rgba(99, 102, 241, 0.7); box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
 }
 
+.slot-card.in-progress {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.04) 100%) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+  animation: breathe-border-active 2s infinite ease-in-out;
+}
+
+@keyframes breathe-border-active {
+  0%, 100% { border-color: rgba(99, 102, 241, 0.5); box-shadow: 0 0 10px rgba(99, 102, 241, 0.15); }
+  50% { border-color: var(--primary); box-shadow: 0 0 20px rgba(99, 102, 241, 0.35); }
+}
+
+.slot-in-progress-icon {
+  font-size: 1.1rem;
+  color: #818cf8;
+  filter: drop-shadow(0 0 5px var(--primary));
+  font-weight: bold;
+  animation: pulse-icon 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-icon {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.2); opacity: 1; }
+}
+
 .slot-card.on-time, .slot-card.checked {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.01) 100%);
   border-color: rgba(16, 185, 129, 0.3);

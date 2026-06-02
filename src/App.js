@@ -86,38 +86,77 @@ export default function App() {
     }
   }, [session, fetchAll])
 
-  // Handle slot toggle on Supabase
+  // Handle slot toggle on Supabase (Three-state machine: Unchecked -> In Progress -> Completed -> Unchecked)
   async function handleToggle(slotId) {
     if (!session?.user) return
     try {
       const existing = checkins.find(c => c.slot_id === slotId && c.date === today)
 
-      if (existing?.checked_at) {
-        // Uncheck: set checked_at to null in database
-        const { error } = await supabase.from('checkins').update({ checked_at: null }).eq('id', existing.id)
-        if (error) throw error
-        setCheckins(prev => prev.map(c => c.id === existing.id ? { ...c, checked_at: null } : c))
-      } else {
+      if (!existing) {
+        // State 1: Unchecked -> In Progress
+        // Store checked_at as the start time and status as 'in_progress'
         const nowStr = new Date().toISOString()
-        if (existing) {
-          const { error } = await supabase.from('checkins').update({ checked_at: nowStr }).eq('id', existing.id)
-          if (error) throw error
-          setCheckins(prev => prev.map(c => c.id === existing.id ? { ...c, checked_at: nowStr } : c))
-        } else {
-          const { data, error } = await supabase.from('checkins').insert({
-            user_id: session.user.id,
-            date: today,
-            slot_id: slotId,
-            checked_at: nowStr,
-          }).select().single()
-          if (error) throw error
-          if (data) setCheckins(prev => [...prev, data])
-        }
+        const { data, error } = await supabase.from('checkins').insert({
+          user_id: session.user.id,
+          date: today,
+          slot_id: slotId,
+          checked_at: nowStr,
+          status: 'in_progress',
+        }).select().single()
+        if (error) throw error
+        if (data) setCheckins(prev => [...prev, data])
+      } else if (existing.status === 'in_progress') {
+        // State 2: In Progress -> Completed
+        // Keep checked_at as the locked start time, but change status to 'completed'
+        const { error } = await supabase.from('checkins').update({ status: 'completed' }).eq('id', existing.id)
+        if (error) throw error
+        setCheckins(prev => prev.map(c => c.id === existing.id ? { ...c, status: 'completed' } : c))
+      } else {
+        // State 3: Completed -> Unchecked
+        // Delete row to clear check-in completely
+        const { error } = await supabase.from('checkins').delete().eq('id', existing.id)
+        if (error) throw error
+        setCheckins(prev => prev.filter(c => c.id !== existing.id))
       }
     } catch (e) {
-      console.error('Failed to save checkin to Supabase:', e)
+      console.error('Failed to toggle checkin state:', e)
     }
   }
+
+  // Auto-complete expired 'in_progress' slots in background
+  useEffect(() => {
+    if (!session?.user || checkins.length === 0) return
+
+    const nowMin = now.getHours() * 60 + now.getMinutes()
+    
+    // Find in-progress slots for today that have expired
+    const expiredInProgress = checkins.filter(ci => 
+      ci.status === 'in_progress' && 
+      ci.date === today
+    ).filter(ci => {
+      const slot = SLOTS.find(s => s.id === ci.slot_id)
+      if (!slot) return false
+      const end = slot.endH === 0 && slot.endM === 0 ? 24 * 60 : slot.endH * 60 + slot.endM
+      return nowMin > end + 5 // End time plus 5 mins buffer
+    })
+
+    if (expiredInProgress.length > 0) {
+      expiredInProgress.forEach(async (ci) => {
+        try {
+          await supabase
+            .from('checkins')
+            .update({ status: 'completed' })
+            .eq('id', ci.id)
+        } catch (e) {
+          console.error('Failed to auto-complete expired slot:', e)
+        }
+      })
+      // Reactively update local state so UI updates instantly
+      setCheckins(prev => prev.map(c => 
+        expiredInProgress.some(e => e.id === c.id) ? { ...c, status: 'completed' } : c
+      ))
+    }
+  }, [now, checkins, session, today])
 
   // Change day in date nav
   function changeDay(dir) {
