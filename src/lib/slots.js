@@ -1,5 +1,5 @@
 export const SLOTS = [
-  { id: 'sleep',     label: 'Ngủ đúng giờ',          icon: '😴', startH: 0,  startM: 0,  endH: 0,  endM: 30,  durationMin: null },
+  { id: 'sleep',     label: 'Ngủ đúng giờ',          icon: '😴', startH: 0,  startM: 0,  endH: 6,  endM: 0,   durationMin: 360 },
   { id: 'wake',      label: 'Thức dậy',           icon: '☀️', startH: 6,  startM: 0,  endH: 6,  endM: 30,  durationMin: null },
   { id: 'commute',   label: 'Xuất phát đi làm',    icon: '🚗', startH: 7,  startM: 0,  endH: 7,  endM: 30,  durationMin: null },
   { id: 'work',      label: 'Văn phòng',            icon: '💼', startH: 8,  startM: 0,  endH: 17, endM: 30,  durationMin: 570 },

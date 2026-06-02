@@ -181,9 +181,9 @@ export default function App() {
 
   // 1. COMPUTING ADVANCED COMPLIANCE STATISTICS FOR SLOTS
   // We scan the history to find how consistent we are with each slot.
-  const totalDaysInHistory = history.length + 1 // including today
   const slotComplianceStats = SLOTS.map(slot => {
-    let completedCount = 0
+    let totalScore = 0
+    let evaluatedDays = 0
     let onTimeCount = 0
     let lateCount = 0
     let missedCount = 0
@@ -193,19 +193,36 @@ export default function App() {
     
     allRecordedDays.forEach(day => {
       const ci = day.checkins.find(c => c.slot_id === slot.id)
+      const status = getSlotStatus(slot, ci?.checked_at, day.date)
+      
+      // Do not count future or active slots for today yet, as they are not finished
+      if (status === 'future' || status === 'active') {
+        return
+      }
+
+      evaluatedDays++
+
       if (ci?.checked_at) {
-        completedCount++
-        const status = getSlotStatus(slot, ci.checked_at, day.date)
-        if (status === 'on_time') onTimeCount++
-        else if (status === 'late') lateCount++
+        if (status === 'on_time') {
+          onTimeCount++
+          totalScore += 100
+        } else if (status === 'late') {
+          lateCount++
+          const checkedTime = new Date(ci.checked_at)
+          const checkedMin = checkedTime.getHours() * 60 + checkedTime.getMinutes()
+          const start = slot.startH * 60 + slot.startM
+          const delay = checkedMin - start
+          const scoreForSlot = Math.max(0, 100 - Math.floor(delay / 5) * 10)
+          totalScore += scoreForSlot
+        }
       } else {
-        // If the day is fully recorded or it's today and the time has passed, it's missed
-        const status = getSlotStatus(slot, null, day.date)
-        if (status === 'missed') missedCount++
+        if (status === 'missed') {
+          missedCount++
+        }
       }
     })
 
-    const completionRate = totalDaysInHistory > 0 ? Math.round((completedCount / totalDaysInHistory) * 100) : 0
+    const completionRate = evaluatedDays > 0 ? Math.round(totalScore / evaluatedDays) : 0
 
     return {
       id: slot.id,
@@ -215,14 +232,14 @@ export default function App() {
       onTimeCount,
       lateCount,
       missedCount,
-      completedCount,
+      completedCount: onTimeCount + lateCount,
+      evaluatedDays,
     }
   })
 
   // Filter slots into Best Habits (>= 70%) and Needs Improvement (< 70%)
-  // If no history, everything is empty.
-  const bestHabits = slotComplianceStats.filter(s => s.completedCount > 0 && s.completionRate >= 70).sort((a, b) => b.completionRate - a.completionRate)
-  const badHabits = slotComplianceStats.filter(s => s.completedCount === 0 || s.completionRate < 70).sort((a, b) => a.completionRate - b.completionRate)
+  const bestHabits = slotComplianceStats.filter(s => s.evaluatedDays > 0 && s.completionRate >= 70).sort((a, b) => b.completionRate - a.completionRate)
+  const badHabits = slotComplianceStats.filter(s => s.evaluatedDays === 0 || s.completionRate < 70).sort((a, b) => a.completionRate - b.completionRate)
 
   // 2. GENERATING CHART DATA
   // We prepare chronological 7 days of percentages (including today)
