@@ -24,6 +24,15 @@ export default function App() {
   // Navigation tabs on mobile ('checkin' | 'analytics')
   const [activeTab, setActiveTab] = useState('checkin')
 
+  const [companyOverrides, setCompanyOverrides] = useState(() => {
+    try {
+      const saved = localStorage.getItem('remote_company_overrides')
+      return saved ? JSON.parse(saved) : {}
+    } catch {
+      return {}
+    }
+  })
+
   const today = todayStr()
   const todayCheckins = checkins.filter(c => c.date === today)
   useNotifications(todayCheckins)
@@ -33,6 +42,25 @@ export default function App() {
     const t = setInterval(() => setNow(new Date()), 30000)
     return () => clearInterval(t)
   }, [])
+
+  const handleToggleCompany = useCallback((dateStr) => {
+    const defaultCo = getRemoteCompany(dateStr)
+    const currentCo = companyOverrides[dateStr] || defaultCo
+    
+    let nextCo = 'HacoLED'
+    if (currentCo === 'HacoLED') {
+      nextCo = 'TavaLED'
+    } else if (currentCo === 'TavaLED') {
+      nextCo = 'Công ty chính'
+    } else {
+      nextCo = 'HacoLED'
+    }
+    
+    const updated = { ...companyOverrides, [dateStr]: nextCo }
+    setCompanyOverrides(updated)
+    localStorage.setItem('remote_company_overrides', JSON.stringify(updated))
+  }, [companyOverrides])
+
 
   // Supabase Auth listener (Session persistence is handled automatically by Supabase)
   useEffect(() => {
@@ -250,7 +278,7 @@ export default function App() {
   }
 
   const isToday = viewDate === today
-  const remoteCompany = getRemoteCompany(viewDate)
+  const remoteCompany = companyOverrides[viewDate] || getRemoteCompany(viewDate)
   const viewCheckins = checkins.filter(c => c.date === viewDate)
   const score = calcDayScore(SLOTS, viewCheckins)
   
@@ -451,7 +479,14 @@ export default function App() {
             </button>
             <span className="date-label">
               {isToday ? 'Hôm nay' : new Date(viewDate + 'T12:00:00').toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'numeric' })}
-              {' · '}<span className="company-tag">{remoteCompany}</span>
+              {' · '}
+              <span 
+                className="company-tag" 
+                onClick={() => handleToggleCompany(viewDate)}
+                title="Nhấp để thay đổi công ty (HacoLED / TavaLED / Công ty chính)"
+              >
+                {remoteCompany} ⇆
+              </span>
             </span>
             <button className="nav-arrow" onClick={() => changeDay(1)} disabled={isToday}>
               <IconChevronRight className="nav-arrow-svg" />
