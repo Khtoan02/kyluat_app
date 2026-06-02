@@ -1,12 +1,12 @@
 export const SLOTS = [
-  { id: 'sleep',     label: 'Ngủ đúng giờ',          icon: '😴', startH: 0,  startM: 0,  endH: 6,  endM: 0,   durationMin: 360 },
-  { id: 'wake',      label: 'Thức dậy',           icon: '☀️', startH: 6,  startM: 0,  endH: 6,  endM: 30,  durationMin: null },
-  { id: 'commute',   label: 'Xuất phát đi làm',    icon: '🚗', startH: 7,  startM: 0,  endH: 7,  endM: 30,  durationMin: null },
-  { id: 'work',      label: 'Văn phòng',            icon: '💼', startH: 8,  startM: 0,  endH: 17, endM: 30,  durationMin: 570 },
-  { id: 'family',    label: 'Gia đình & cơm nước',  icon: '🏠', startH: 18, startM: 0,  endH: 20, endM: 0,   durationMin: 120 },
-  { id: 'remote',    label: 'Remote công ty',        icon: '💻', startH: 20, startM: 0,  endH: 22, endM: 30,  durationMin: 150 },
-  { id: 'relax',     label: 'Giải trí có chủ đích', icon: '🎮', startH: 22, startM: 30, endH: 23, endM: 30,  durationMin: 60 },
-  { id: 'winddown',  label: 'Wind down',             icon: '🌙', startH: 23, startM: 30, endH: 0,  endM: 0,   durationMin: 30 },
+  { id: 'sleep',     label: 'Ngủ đúng giờ',          icon: 'sleep',    startH: 0,  startM: 0,  endH: 6,  endM: 0,   durationMin: 360 },
+  { id: 'wake',      label: 'Thức dậy',           icon: 'wake',     startH: 6,  startM: 0,  endH: 6,  endM: 30,  durationMin: null },
+  { id: 'commute',   label: 'Xuất phát đi làm',    icon: 'commute',  startH: 7,  startM: 0,  endH: 7,  endM: 30,  durationMin: null },
+  { id: 'work',      label: 'Văn phòng',            icon: 'work',     startH: 8,  startM: 0,  endH: 17, endM: 30,  durationMin: 570 },
+  { id: 'family',    label: 'Gia đình & cơm nước',  icon: 'family',   startH: 18, startM: 0,  endH: 20, endM: 0,   durationMin: 120 },
+  { id: 'remote',    label: 'Remote công ty',        icon: 'remote',   startH: 20, startM: 0,  endH: 22, endM: 30,  durationMin: 150 },
+  { id: 'relax',     label: 'Giải trí có chủ đích', icon: 'relax',    startH: 22, startM: 30, endH: 23, endM: 30,  durationMin: 60 },
+  { id: 'winddown',  label: 'Wind down',             icon: 'winddown', startH: 23, startM: 30, endH: 0,  endM: 0,   durationMin: 30 },
 ]
 
 export const BUFFER_MIN = 5

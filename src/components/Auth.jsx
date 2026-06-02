@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { IconSparkle, IconMail, IconLock } from './Icons'
 
 export default function Auth() {
   const [email, setEmail] = useState('')
@@ -47,14 +48,14 @@ export default function Auth() {
       
       <div className="auth-card">
         <div className="auth-branding">
-          <span className="logo-icon">✨</span>
+          <IconSparkle className="logo-icon-svg" />
           <h1 className="auth-logo">KỶ LUẬT</h1>
         </div>
         <p className="auth-sub">Đồng bộ đám mây và rèn luyện thói quen kỷ luật mỗi ngày</p>
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="input-group">
-            <span className="input-icon">✉️</span>
+            <IconMail className="input-icon-svg" />
             <input
               type="email"
               placeholder="Địa chỉ Email"
@@ -66,7 +67,7 @@ export default function Auth() {
           </div>
           
           <div className="input-group">
-            <span className="input-icon">🔒</span>
+            <IconLock className="input-icon-svg" />
             <input
               type="password"
               placeholder="Mật khẩu"
@@ -90,7 +91,6 @@ export default function Auth() {
         
         {msg && (
           <p className={`auth-msg ${isSuccess ? 'success' : 'error'}`}>
-            {isSuccess ? '✅ ' : '⚠️ '}
             {msg}
           </p>
         )}

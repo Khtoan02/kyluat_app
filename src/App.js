@@ -2,8 +2,13 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from './lib/supabase'
 import { SLOTS, todayStr, getRemoteCompany, calcDayScore, getSlotStatus, formatDateVi } from './lib/slots'
 import { useNotifications } from './lib/useNotifications'
-import Auth from './components/Auth'
 import SlotCard from './components/SlotCard'
+import { 
+  IconSparkle, IconUser, IconReload, IconWarning,
+  IconBackup, IconRestore, IconLogout, 
+  IconStreak, IconTarget, IconBarChart,
+  IconChevronLeft, IconChevronRight
+} from './components/Icons'
 import './App.css'
 
 export default function App() {
@@ -345,7 +350,7 @@ export default function App() {
         <div className={`app-card column-timeline ${activeTab === 'checkin' ? 'active-mobile' : 'inactive-mobile'}`}>
           <header className="app-header">
             <div className="app-branding">
-              <span className="logo-icon">✨</span>
+              <IconSparkle className="logo-icon-svg" />
               <div className="app-logo">KỶ LUẬT</div>
             </div>
             <div className="header-actions">
@@ -354,14 +359,15 @@ export default function App() {
                 onClick={() => window.location.reload()}
                 title="Tải lại trang"
               >
-                🔄
+                <IconReload className="reload-btn-svg" />
               </button>
               <button 
                 className={`data-panel-btn ${showDataPanel ? 'active' : ''}`} 
                 onClick={() => setShowDataPanel(!showDataPanel)}
                 title="Quản lý Tài khoản & Dữ liệu"
               >
-                👤 Tài khoản
+                <IconUser className="btn-icon-svg" />
+                <span>Tài khoản</span>
               </button>
             </div>
           </header>
@@ -373,16 +379,19 @@ export default function App() {
               
               <div className="data-actions">
                 <button className="btn-action export" onClick={handleExport}>
-                  📤 Xuất file (Backup)
+                  <IconBackup className="panel-icon-svg" />
+                  <span>Xuất file (Backup)</span>
                 </button>
                 
                 <label className="btn-action import">
-                  📥 Nhập file (Restore)
+                  <IconRestore className="panel-icon-svg" />
+                  <span>Nhập file (Restore)</span>
                   <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
                 </label>
 
                 <button className="btn-action reset" onClick={() => supabase.auth.signOut()}>
-                  🚪 Đăng xuất tài khoản
+                  <IconLogout className="panel-icon-svg" />
+                  <span>Đăng xuất tài khoản</span>
                 </button>
               </div>
             </div>
@@ -392,7 +401,7 @@ export default function App() {
             <div className="stat-card">
               <div className="stat-val-wrapper">
                 <span className="stat-val">{streak}</span>
-                <span className="stat-emoji">🔥</span>
+                <IconStreak className="stat-icon-svg streak" />
               </div>
               <div className="stat-lbl">Chuỗi kỷ luật</div>
             </div>
@@ -400,7 +409,7 @@ export default function App() {
             <div className="stat-card highlight">
               <div className="stat-val-wrapper">
                 <span className="stat-val">{score}%</span>
-                <span className="stat-emoji">🎯</span>
+                <IconTarget className="stat-icon-svg target" />
               </div>
               <div className="stat-lbl">{isToday ? 'Hôm nay' : 'Ngày này'}</div>
             </div>
@@ -408,7 +417,7 @@ export default function App() {
             <div className="stat-card">
               <div className="stat-val-wrapper">
                 <span className="stat-val">{avgScore !== null ? avgScore + '%' : '—'}</span>
-                <span className="stat-emoji">📊</span>
+                <IconBarChart className="stat-icon-svg chart" />
               </div>
               <div className="stat-lbl">Trung bình</div>
             </div>
@@ -416,7 +425,7 @@ export default function App() {
 
           {isToday && missedToday.length > 0 && (
             <div className="miss-banner">
-              <span className="banner-icon">⚠️</span>
+              <IconWarning className="banner-icon-svg" />
               <div className="banner-content">
                 <strong>Bỏ lỡ:</strong> {missedToday.map(s => s.label).join(', ')}
               </div>
@@ -436,12 +445,16 @@ export default function App() {
           </div>
 
           <div className="date-nav">
-            <button className="nav-arrow" onClick={() => changeDay(-1)}>‹</button>
+            <button className="nav-arrow" onClick={() => changeDay(-1)}>
+              <IconChevronLeft className="nav-arrow-svg" />
+            </button>
             <span className="date-label">
               {isToday ? 'Hôm nay' : new Date(viewDate + 'T12:00:00').toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'numeric' })}
               {' · '}<span className="company-tag">{remoteCompany}</span>
             </span>
-            <button className="nav-arrow" onClick={() => changeDay(1)} disabled={isToday}>›</button>
+            <button className="nav-arrow" onClick={() => changeDay(1)} disabled={isToday}>
+              <IconChevronRight className="nav-arrow-svg" />
+            </button>
           </div>
 
           <div className="slots-list">
@@ -579,18 +592,23 @@ export default function App() {
                 <p className="no-data-text mini">Thực hiện kỷ luật đúng giờ liên tục để xếp hạng tại đây.</p>
               ) : (
                 <div className="habit-list">
-                  {bestHabits.map(habit => (
-                    <div key={habit.id} className="habit-item">
-                      <span className="habit-icon-wrap">{habit.icon}</span>
-                      <div className="habit-detail">
-                        <div className="habit-name">{habit.label}</div>
-                        <div className="habit-stats">
-                          Đúng giờ: {habit.onTimeCount}L {habit.lateCount > 0 && `· Trễ: ${habit.lateCount}L`}
+                  {bestHabits.map(habit => {
+                    const HabitIcon = ICON_MAP[habit.icon] || IconWork
+                    return (
+                      <div key={habit.id} className="habit-item">
+                        <span className="habit-icon-wrap">
+                          <HabitIcon className="habit-icon-svg" />
+                        </span>
+                        <div className="habit-detail">
+                          <div className="habit-name">{habit.label}</div>
+                          <div className="habit-stats">
+                            Đúng giờ: {habit.onTimeCount}L {habit.lateCount > 0 && `· Trễ: ${habit.lateCount}L`}
+                          </div>
                         </div>
+                        <div className="habit-rate success">{habit.completionRate}%</div>
                       </div>
-                      <div className="habit-rate success">{habit.completionRate}%</div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -602,21 +620,26 @@ export default function App() {
                 <p className="no-data-text mini">Quá xuất sắc! Bạn không có thói quen nào cần cải thiện.</p>
               ) : (
                 <div className="habit-list">
-                  {badHabits.map(habit => (
-                    <div key={habit.id} className="habit-item">
-                      <span className="habit-icon-wrap">{habit.icon}</span>
-                      <div className="habit-detail">
-                        <div className="habit-name">{habit.label}</div>
-                        <div className="habit-stats">
-                          {habit.evaluatedDays > 0 
-                            ? `Đã làm: ${habit.completedCount}L · Bỏ lỡ: ${habit.missedCount}L`
-                            : 'Chưa từng check-in trong tuần này'
-                          }
+                  {badHabits.map(habit => {
+                    const HabitIcon = ICON_MAP[habit.icon] || IconWork
+                    return (
+                      <div key={habit.id} className="habit-item">
+                        <span className="habit-icon-wrap">
+                          <HabitIcon className="habit-icon-svg" />
+                        </span>
+                        <div className="habit-detail">
+                          <div className="habit-name">{habit.label}</div>
+                          <div className="habit-stats">
+                            {habit.evaluatedDays > 0 
+                              ? `Đã làm: ${habit.completedCount}L · Bỏ lỡ: ${habit.missedCount}L`
+                              : 'Chưa từng check-in trong tuần này'
+                            }
+                          </div>
                         </div>
+                        <div className="habit-rate warning">{habit.completionRate}%</div>
                       </div>
-                      <div className="habit-rate warning">{habit.completionRate}%</div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -632,14 +655,14 @@ export default function App() {
           className={`mobile-nav-item ${activeTab === 'checkin' ? 'active' : ''}`}
           onClick={() => setActiveTab('checkin')}
         >
-          <span className="nav-icon">🎯</span>
+          <IconTarget className="nav-icon" />
           <span className="nav-text">Nhiệm vụ</span>
         </button>
         <button 
           className={`mobile-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
           onClick={() => setActiveTab('analytics')}
         >
-          <span className="nav-icon">📊</span>
+          <IconBarChart className="nav-icon" />
           <span className="nav-text">Phân tích</span>
         </button>
       </nav>
@@ -655,9 +678,4 @@ function calcStreak(history, todayCheckins) {
     else break
   }
   return streak
-}
-
-function getSlotStatusFromLib(slot, checkedAt, dateStr) {
-  const { getSlotStatus } = require('./lib/slots')
-  return getSlotStatus(slot, checkedAt, dateStr)
 }

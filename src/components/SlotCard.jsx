@@ -1,13 +1,29 @@
-import { getSlotStatus, slotStartMinutes, formatTime, BUFFER_MIN } from '../lib/slots'
-import { todayStr } from '../lib/slots'
+import React from 'react'
+import { getSlotStatus, slotStartMinutes, formatTime, BUFFER_MIN, todayStr } from '../lib/slots'
+import { 
+  IconSleep, IconWake, IconCommute, IconWork, 
+  IconFamily, IconRemote, IconRelax, IconWinddown,
+  IconCheck, IconLightning 
+} from './Icons'
 
 const STATUS_CONFIG = {
   future:      { label: 'Sắp tới',               cls: 'future'      },
   active:      { label: 'Bạn đang làm cái này? 🤔', cls: 'active'      },
-  in_progress: { label: 'Đang thực hiện... ⚡',     cls: 'in-progress' },
+  in_progress: { label: 'Đang thực hiện...',     cls: 'in-progress' },
   on_time:     { label: 'Đúng giờ',              cls: 'on-time'     },
   late:        { label: 'Trễ',                   cls: 'late'        },
   missed:      { label: 'Bỏ lỡ',                 cls: 'missed'      },
+}
+
+const ICON_MAP = {
+  sleep:     IconSleep,
+  wake:      IconWake,
+  commute:   IconCommute,
+  work:      IconWork,
+  family:    IconFamily,
+  remote:    IconRemote,
+  relax:     IconRelax,
+  winddown:  IconWinddown,
 }
 
 export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompany }) {
@@ -25,7 +41,7 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
   if (isChecked && checkin?.checked_at) {
     const checkedMin = new Date(checkin.checked_at).getHours() * 60 + new Date(checkin.checked_at).getMinutes()
     const delay = checkedMin - slotStartMinutes(slot)
-    if (delay <= BUFFER_MIN) delayText = '✓ Đúng giờ'
+    if (delay <= BUFFER_MIN) delayText = 'Đúng giờ'
     else delayText = `+${delay} phút`
   }
 
@@ -40,7 +56,7 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
   // Score for this slot (only calculated and visible when completed)
   let score = null
   if (isChecked) {
-    if (delayText === '✓ Đúng giờ') score = 100
+    if (delayText === 'Đúng giờ') score = 100
     else {
       const checkedMin = new Date(checkin.checked_at).getHours() * 60 + new Date(checkin.checked_at).getMinutes()
       const delay = checkedMin - slotStartMinutes(slot)
@@ -50,6 +66,8 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
     score = 0
   }
 
+  const IconComponent = ICON_MAP[slot.icon] || IconWork
+
   return (
     <div
       className={`slot-card ${cfg.cls} ${isChecked ? 'checked' : ''} ${status === 'in_progress' ? 'in-progress' : ''}`}
@@ -57,7 +75,9 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
       role={canCheck ? 'button' : undefined}
       tabIndex={canCheck ? 0 : undefined}
     >
-      <div className="slot-icon">{slot.icon}</div>
+      <div className="slot-icon">
+        <IconComponent className="slot-icon-svg" />
+      </div>
       <div className="slot-info">
         <div className="slot-label">{label}</div>
         <div className="slot-time">{timeLabel}</div>
@@ -70,8 +90,8 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
         )}
         <div className={`slot-badge ${cfg.cls}`}>{cfg.label}</div>
         {delayText && <div className="slot-delay">{delayText}</div>}
-        {status === 'in_progress' && <div className="slot-in-progress-icon">⚡</div>}
-        {isChecked && <div className="slot-check">✓</div>}
+        {status === 'in_progress' && <IconLightning className="slot-in-progress-svg" />}
+        {isChecked && <IconCheck className="slot-check-svg" />}
       </div>
     </div>
   )

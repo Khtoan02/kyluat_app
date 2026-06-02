@@ -1254,3 +1254,133 @@ body {
   color: var(--text-primary);
 }
 
+/* ==========================================================================
+   VECTOR SVG ICONS DESIGN SYSTEM
+   ========================================================================== */
+
+.logo-icon-svg {
+  width: 22px;
+  height: 22px;
+  color: var(--primary);
+  filter: drop-shadow(0 0 6px var(--primary));
+  stroke-width: 2;
+}
+
+.btn-icon-svg {
+  width: 15px;
+  height: 15px;
+  color: inherit;
+  stroke-width: 2;
+  margin-right: 6px;
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+
+.reload-btn-svg {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  stroke-width: 2;
+  display: block;
+}
+
+.panel-icon-svg {
+  width: 15px;
+  height: 15px;
+  color: inherit;
+  stroke-width: 2;
+  margin-right: 6px;
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+
+.stat-icon-svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  display: inline-block;
+}
+
+.stat-icon-svg.streak {
+  color: #ef4444;
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
+}
+
+.stat-icon-svg.target {
+  color: #6366f1;
+  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.4));
+}
+
+.stat-icon-svg.chart {
+  color: #10b981;
+  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
+}
+
+.banner-icon-svg {
+  width: 18px;
+  height: 18px;
+  color: #ef4444;
+  stroke-width: 2;
+  flex-shrink: 0;
+  display: inline-block;
+  margin-top: 1px;
+}
+
+.nav-arrow-svg {
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  stroke-width: 2.5;
+  display: block;
+}
+
+.slot-icon-svg {
+  width: 20px;
+  height: 20px;
+  color: inherit;
+  stroke-width: 2;
+  display: block;
+}
+
+.slot-check-svg {
+  width: 18px;
+  height: 18px;
+  color: var(--success);
+  filter: drop-shadow(0 0 4px var(--success));
+  stroke-width: 2.5;
+  display: block;
+}
+
+.slot-in-progress-svg {
+  width: 18px;
+  height: 18px;
+  color: #818cf8;
+  filter: drop-shadow(0 0 4px #818cf8);
+  stroke-width: 2;
+  display: block;
+  animation: pulse-icon 1.5s infinite alternate ease-in-out;
+}
+
+.input-icon-svg {
+  position: absolute;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  stroke-width: 2;
+}
+
+.nav-icon-svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  transition: var(--transition);
+}
+
+.mobile-nav-item.active .nav-icon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px var(--primary));
+  color: var(--primary);
+}
+
