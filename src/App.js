@@ -27,10 +27,16 @@ export default function App() {
   const [companyOverrides, setCompanyOverrides] = useState(() => {
     try {
       const saved = localStorage.getItem('remote_company_overrides')
-      return saved ? JSON.parse(saved) : {}
-    } catch {
-      return {}
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          return parsed
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing company overrides:', e)
     }
+    return {}
   })
 
   const today = todayStr()
@@ -45,7 +51,8 @@ export default function App() {
 
   const handleToggleCompany = useCallback((dateStr) => {
     const defaultCo = getRemoteCompany(dateStr)
-    const currentCo = companyOverrides[dateStr] || defaultCo
+    const overrides = companyOverrides || {}
+    const currentCo = overrides[dateStr] || defaultCo
     
     let nextCo = 'HacoLED'
     if (currentCo === 'HacoLED') {
@@ -56,7 +63,7 @@ export default function App() {
       nextCo = 'HacoLED'
     }
     
-    const updated = { ...companyOverrides, [dateStr]: nextCo }
+    const updated = { ...overrides, [dateStr]: nextCo }
     setCompanyOverrides(updated)
     localStorage.setItem('remote_company_overrides', JSON.stringify(updated))
   }, [companyOverrides])
@@ -278,7 +285,7 @@ export default function App() {
   }
 
   const isToday = viewDate === today
-  const remoteCompany = companyOverrides[viewDate] || getRemoteCompany(viewDate)
+  const remoteCompany = (companyOverrides || {})[viewDate] || getRemoteCompany(viewDate)
   const viewCheckins = checkins.filter(c => c.date === viewDate)
   const score = calcDayScore(SLOTS, viewCheckins)
   
