@@ -348,13 +348,22 @@ export default function App() {
               <span className="logo-icon">✨</span>
               <div className="app-logo">KỶ LUẬT</div>
             </div>
-            <button 
-              className={`data-panel-btn ${showDataPanel ? 'active' : ''}`} 
-              onClick={() => setShowDataPanel(!showDataPanel)}
-              title="Quản lý Tài khoản & Dữ liệu"
-            >
-              👤 Tài khoản
-            </button>
+            <div className="header-actions">
+              <button 
+                className="reload-btn" 
+                onClick={() => window.location.reload()}
+                title="Tải lại trang"
+              >
+                🔄
+              </button>
+              <button 
+                className={`data-panel-btn ${showDataPanel ? 'active' : ''}`} 
+                onClick={() => setShowDataPanel(!showDataPanel)}
+                title="Quản lý Tài khoản & Dữ liệu"
+              >
+                👤 Tài khoản
+              </button>
+            </div>
           </header>
 
           {showDataPanel && (
