@@ -7,7 +7,8 @@ import {
   IconSparkle, IconUser, IconReload, IconWarning,
   IconBackup, IconRestore, IconLogout, 
   IconStreak, IconTarget, IconBarChart,
-  IconChevronLeft, IconChevronRight
+  IconChevronLeft, IconChevronRight,
+  IconWork, ICON_MAP
 } from './components/Icons'
 import './App.css'
 

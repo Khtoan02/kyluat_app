@@ -227,3 +227,15 @@ export function IconChevronRight({ className }) {
     </svg>
   )
 }
+
+export const ICON_MAP = {
+  sleep: IconSleep,
+  wake: IconWake,
+  commute: IconCommute,
+  work: IconWork,
+  family: IconFamily,
+  remote: IconRemote,
+  relax: IconRelax,
+  winddown: IconWinddown,
+}
+

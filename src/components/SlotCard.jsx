@@ -1,9 +1,7 @@
 import React from 'react'
 import { getSlotStatus, slotStartMinutes, formatTime, BUFFER_MIN, todayStr } from '../lib/slots'
 import { 
-  IconSleep, IconWake, IconCommute, IconWork, 
-  IconFamily, IconRemote, IconRelax, IconWinddown,
-  IconCheck, IconLightning 
+  IconCheck, IconLightning, IconWork, ICON_MAP
 } from './Icons'
 
 const STATUS_CONFIG = {
@@ -13,17 +11,6 @@ const STATUS_CONFIG = {
   on_time:     { label: 'Đúng giờ',              cls: 'on-time'     },
   late:        { label: 'Trễ',                   cls: 'late'        },
   missed:      { label: 'Bỏ lỡ',                 cls: 'missed'      },
-}
-
-const ICON_MAP = {
-  sleep:     IconSleep,
-  wake:      IconWake,
-  commute:   IconCommute,
-  work:      IconWork,
-  family:    IconFamily,
-  remote:    IconRemote,
-  relax:     IconRelax,
-  winddown:  IconWinddown,
 }
 
 export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompany }) {
