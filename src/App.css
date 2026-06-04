@@ -995,7 +995,9 @@ body {
 }
 
 .mobile-nav-item .nav-icon {
-  font-size: 1.25rem;
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
   transition: var(--transition);
 }
 
@@ -1015,7 +1017,8 @@ body {
 
 .mobile-nav-item.active .nav-icon {
   transform: scale(1.1);
-  filter: drop-shadow(0 0 8px var(--primary));
+  filter: drop-shadow(0 0 5px var(--primary));
+  color: var(--primary);
 }
 
 /* ==========================================================================
