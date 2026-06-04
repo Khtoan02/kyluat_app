@@ -1076,12 +1076,99 @@ body {
     padding-bottom: 1rem;
     margin-bottom: 0.25rem;
   }
+
+  .header-actions {
+    display: none !important; /* Hide reload/account buttons on mobile header */
+  }
   
   .clock-footer {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding-top: 1rem;
     margin-top: 0.5rem;
     padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Mobile Account screen styles */
+  .column-account {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .account-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .account-info-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .account-info-card h3 {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .email-highlight {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #a5b4fc;
+    word-break: break-all;
+  }
+
+  .sync-note {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .data-actions-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .data-actions-vertical .btn-action {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .data-actions-vertical .btn-action:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .data-actions-vertical .btn-action.reset {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+  }
+
+  .data-actions-vertical .btn-action.reset:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
   }
 }
 
@@ -1303,6 +1390,11 @@ body {
 
   /* Hide bottom navigation bar on desktop */
   .mobile-nav-bar {
+    display: none !important;
+  }
+
+  /* Hide account tab column on desktop */
+  .column-account {
     display: none !important;
   }
 }

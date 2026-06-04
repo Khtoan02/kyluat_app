@@ -703,6 +703,40 @@ export default function App() {
           </div>
         </div>
 
+        {/* THIRD COLUMN / MOBILE VIEW: ACCOUNT PANEL */}
+        <div className={`app-card column-account ${activeTab === 'account' ? 'active-mobile' : 'inactive-mobile'}`}>
+          <header className="analytics-header">
+            <h2 className="section-title">👤 QUẢN LÝ TÀI KHOẢN</h2>
+            <p className="section-subtitle">Thông tin tài khoản & Dữ liệu đồng bộ</p>
+          </header>
+
+          <div className="account-content">
+            <div className="account-info-card">
+              <h3>Tài khoản:</h3>
+              <p className="email-highlight">{session?.user?.email}</p>
+              <p className="sync-note">Dữ liệu của bạn được đồng bộ hóa thời gian thực đám mây 100% bảo mật.</p>
+            </div>
+            
+            <div className="data-actions-vertical">
+              <button className="btn-action export" onClick={handleExport}>
+                <IconBackup className="panel-icon-svg" />
+                <span>Xuất file (Backup)</span>
+              </button>
+              
+              <label className="btn-action import">
+                <IconRestore className="panel-icon-svg" />
+                <span>Nhập file (Restore)</span>
+                <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
+              </label>
+
+              <button className="btn-action reset" onClick={() => supabase.auth.signOut()}>
+                <IconLogout className="panel-icon-svg" />
+                <span>Đăng xuất tài khoản</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       {/* MOBILE BOTTOM NAVIGATION TAB BAR */}
@@ -720,6 +754,20 @@ export default function App() {
         >
           <IconBarChart className="nav-icon" />
           <span className="nav-text">Phân tích</span>
+        </button>
+        <button 
+          className={`mobile-nav-item ${activeTab === 'account' ? 'active' : ''}`}
+          onClick={() => setActiveTab('account')}
+        >
+          <IconUser className="nav-icon" />
+          <span className="nav-text">Tài khoản</span>
+        </button>
+        <button 
+          className="mobile-nav-item"
+          onClick={() => window.location.reload()}
+        >
+          <IconReload className="nav-icon" />
+          <span className="nav-text">Tải lại</span>
         </button>
       </nav>
     </div>

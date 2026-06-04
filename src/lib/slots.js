@@ -118,3 +118,15 @@ export function formatDateVi(dateStr) {
   const d = new Date(dateStr + 'T12:00:00')
   return d.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'numeric' })
 }
+
+export function minutesUntilStart(slot, now = new Date()) {
+  const nowMin = now.getHours() * 60 + now.getMinutes()
+  const startMin = slot.startH * 60 + slot.startM
+  
+  let diff = startMin - nowMin
+  // If start is tomorrow (e.g. start is 00:00 and now is 23:50)
+  if (diff < -1200) {
+    diff += 24 * 60
+  }
+  return diff
+}
