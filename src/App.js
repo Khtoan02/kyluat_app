@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from './lib/supabase'
-import { SLOTS, todayStr, getRemoteCompany, calcDayScore, getSlotStatus, formatDateVi } from './lib/slots'
+import { SLOTS, todayStr, getRemoteCompany, calcDayScore, getSlotStatus, formatDateVi, tomorrowStr, getSlotScore } from './lib/slots'
 import { useNotifications } from './lib/useNotifications'
 import SlotCard from './components/SlotCard'
 import { 
@@ -84,10 +84,10 @@ export default function App() {
   const fetchAll = useCallback(async (userId) => {
     setLoading(true)
     try {
-      // Fetch last 7 days + today
-      const dates = Array.from({ length: 8 }, (_, i) => {
+      // Fetch tomorrow + today + last 7 days (9 days total)
+      const dates = Array.from({ length: 9 }, (_, i) => {
         const d = new Date()
-        d.setDate(d.getDate() - i)
+        d.setDate(d.getDate() - i + 1)
         return d.toISOString().slice(0, 10)
       })
 
@@ -100,9 +100,9 @@ export default function App() {
       if (error) throw error
 
       if (data) {
-        setCheckins(data.filter(c => c.date === today))
+        setCheckins(data.filter(c => c.date === today || c.date === tomorrowStr()))
 
-        const hist = dates.slice(1).map(date => ({
+        const hist = dates.slice(2).map(date => ({
           date,
           checkins: data.filter(c => c.date === date)
         })).filter(h => h.checkins.length > 0)
@@ -131,7 +131,7 @@ export default function App() {
   async function handleToggle(slotId) {
     if (!session?.user) return
     try {
-      const existing = checkins.find(c => c.slot_id === slotId && c.date === today)
+      const existing = checkins.find(c => c.slot_id === slotId && c.date === viewDate)
 
       if (!existing) {
         // State 1: Unchecked -> In Progress
@@ -139,7 +139,7 @@ export default function App() {
         const nowStr = new Date().toISOString()
         const { data, error } = await supabase.from('checkins').insert({
           user_id: session.user.id,
-          date: today,
+          date: viewDate,
           slot_id: slotId,
           checked_at: nowStr,
           status: 'in_progress',
@@ -153,11 +153,8 @@ export default function App() {
         if (error) throw error
         setCheckins(prev => prev.map(c => c.id === existing.id ? { ...c, status: 'completed' } : c))
       } else {
-        // State 3: Completed -> Unchecked
-        // Delete row to clear check-in completely
-        const { error } = await supabase.from('checkins').delete().eq('id', existing.id)
-        if (error) throw error
-        setCheckins(prev => prev.filter(c => c.id !== existing.id))
+        // State 3: Completed -> Unchecked (Ignored/No-op to protect completed states)
+        return
       }
     } catch (e) {
       console.error('Failed to toggle checkin state:', e)
@@ -204,7 +201,15 @@ export default function App() {
     const d = new Date(viewDate + 'T12:00:00')
     d.setDate(d.getDate() + dir)
     const next = d.toISOString().slice(0, 10)
-    if (next <= today) setViewDate(next)
+    
+    const nowMin = now.getHours() * 60 + now.getMinutes()
+    const isLateNight = nowMin >= 23 * 60 + 30
+    let maxDate = today
+    if (isLateNight) {
+      maxDate = tomorrowStr()
+    }
+    
+    if (next <= maxDate) setViewDate(next)
   }
 
   // Export checkins to a JSON file (handy offline backup)
@@ -285,8 +290,18 @@ export default function App() {
   }
 
   const isToday = viewDate === today
+  const nowMin = now.getHours() * 60 + now.getMinutes()
+  const isLateNight = nowMin >= 23 * 60 + 30
+  let maxDate = today
+  if (isLateNight) {
+    maxDate = tomorrowStr()
+  }
+  const isMaxDate = viewDate === maxDate
+
   const remoteCompany = (companyOverrides || {})[viewDate] || getRemoteCompany(viewDate)
-  const viewCheckins = checkins.filter(c => c.date === viewDate)
+  const viewCheckins = viewDate === today || viewDate === tomorrowStr()
+    ? checkins.filter(c => c.date === viewDate)
+    : (history.find(h => h.date === viewDate)?.checkins || [])
   const score = calcDayScore(SLOTS, viewCheckins)
   
   // Calculate Streak from history checkins
@@ -335,11 +350,7 @@ export default function App() {
           totalScore += 100
         } else if (status === 'late') {
           lateCount++
-          const checkedTime = new Date(ci.checked_at)
-          const checkedMin = checkedTime.getHours() * 60 + checkedTime.getMinutes()
-          const start = slot.startH * 60 + slot.startM
-          const delay = checkedMin - start
-          const scoreForSlot = Math.max(0, 100 - Math.floor(delay / 5) * 10)
+          const scoreForSlot = getSlotScore(slot, ci.checked_at, day.date, ci.status) || 0
           totalScore += scoreForSlot
         }
       } else {
@@ -495,7 +506,7 @@ export default function App() {
                 {remoteCompany} ⇆
               </span>
             </span>
-            <button className="nav-arrow" onClick={() => changeDay(1)} disabled={isToday}>
+            <button className="nav-arrow" onClick={() => changeDay(1)} disabled={isMaxDate}>
               <IconChevronRight className="nav-arrow-svg" />
             </button>
           </div>

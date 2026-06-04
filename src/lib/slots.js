@@ -23,6 +23,12 @@ export function todayStr() {
   return new Date().toISOString().slice(0, 10)
 }
 
+export function tomorrowStr() {
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  return d.toISOString().slice(0, 10)
+}
+
 export function nowMinutes() {
   const n = new Date()
   return n.getHours() * 60 + n.getMinutes()
@@ -37,23 +43,52 @@ export function slotEndMinutes(slot) {
   return slot.endH * 60 + slot.endM
 }
 
+export function getSlotDelay(slot, checkedAt, dateStr) {
+  if (!checkedAt) return 0
+  const checkedTime = new Date(checkedAt)
+  const [yr, mo, dy] = dateStr.split('-').map(Number)
+  const scheduledStart = new Date(yr, mo - 1, dy, slot.startH, slot.startM, 0)
+  return Math.round((checkedTime.getTime() - scheduledStart.getTime()) / (1000 * 60))
+}
+
+export function getSlotScore(slot, checkedAt, dateStr, status) {
+  if (status === 'in_progress') return null
+  if (checkedAt) {
+    const delay = getSlotDelay(slot, checkedAt, dateStr)
+    if (delay <= BUFFER_MIN) return 100
+    return Math.max(0, 100 - Math.floor(delay / 5) * 10)
+  }
+  const currentStatus = getSlotStatus(slot, checkedAt, dateStr, status)
+  if (currentStatus === 'missed') return 0
+  return null
+}
+
 // Returns slot status based on current time and check-in data
 // 'future' | 'active' | 'missed' | 'on_time' | 'late' | 'in_progress'
 export function getSlotStatus(slot, checkedAt, dateStr, status) {
-  const isToday = dateStr === todayStr()
+  const today = todayStr()
+  const isToday = dateStr === today
+  const isTomorrow = dateStr === tomorrowStr()
   const now = nowMinutes()
   const start = slotStartMinutes(slot)
   const end = slotEndMinutes(slot)
 
   if (checkedAt) {
     if (status === 'in_progress') return 'in_progress'
-    const checkedTime = new Date(checkedAt)
-    const checkedMin = checkedTime.getHours() * 60 + checkedTime.getMinutes()
-    const delay = checkedMin - start
+    const delay = getSlotDelay(slot, checkedAt, dateStr)
     return delay <= BUFFER_MIN ? 'on_time' : 'late'
   }
 
-  if (!isToday) return 'missed'
+  if (dateStr < today) {
+    return 'missed'
+  }
+
+  if (dateStr > today) {
+    if (isTomorrow && slot.id === 'sleep' && nowMinutes() >= 23 * 60 + 30) {
+      return 'active'
+    }
+    return 'future'
+  }
 
   if (now < start - BUFFER_MIN) return 'future'
   if (now >= start - BUFFER_MIN && now <= end + BUFFER_MIN) return 'active'
@@ -67,12 +102,8 @@ export function calcDayScore(slots, checkins) {
   slots.forEach(slot => {
     const ci = checkins.find(c => c.slot_id === slot.id)
     if (!ci || !ci.checked_at || ci.status === 'in_progress') return
-    const status = getSlotStatus(slot, ci.checked_at, ci.date, ci.status)
-    if (status === 'on_time') total += 100
-    else if (status === 'late') {
-      const checkedMin = new Date(ci.checked_at).getHours() * 60 + new Date(ci.checked_at).getMinutes()
-      const delay = checkedMin - slotStartMinutes(slot)
-      const score = Math.max(0, 100 - Math.floor(delay / 5) * 10)
+    const score = getSlotScore(slot, ci.checked_at, ci.date, ci.status)
+    if (score !== null) {
       total += score
     }
   })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { getSlotStatus, slotStartMinutes, formatTime, BUFFER_MIN, todayStr } from '../lib/slots'
+import { getSlotStatus, formatTime, BUFFER_MIN, todayStr, tomorrowStr, nowMinutes, getSlotDelay, getSlotScore } from '../lib/slots'
 import { 
   IconCheck, IconLightning, IconWork, ICON_MAP
 } from './Icons'
@@ -16,18 +16,18 @@ const STATUS_CONFIG = {
 export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompany }) {
   const status = getSlotStatus(slot, checkin?.checked_at, dateStr, checkin?.status)
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.future
-  const isToday = dateStr === todayStr()
   
-  // Can click/check if active, future, in_progress, or completed (to allow reset)
-  const canCheck = isToday && (status === 'active' || status === 'future' || status === 'on_time' || status === 'late' || status === 'in_progress')
+  const isCheckable = dateStr === todayStr() || (dateStr === tomorrowStr() && slot.id === 'sleep' && nowMinutes() >= 23 * 60 + 30)
+  
+  // Can click/check if active, future, or in_progress (on_time/late done slots cannot be clicked again to prevent reset)
+  const canCheck = isCheckable && (status === 'active' || status === 'future' || status === 'in_progress')
   
   // Only completed checkins are considered "checked" (shows checkmark, score, delay text)
   const isChecked = !!checkin?.checked_at && checkin?.status !== 'in_progress'
 
   let delayText = ''
   if (isChecked && checkin?.checked_at) {
-    const checkedMin = new Date(checkin.checked_at).getHours() * 60 + new Date(checkin.checked_at).getMinutes()
-    const delay = checkedMin - slotStartMinutes(slot)
+    const delay = getSlotDelay(slot, checkin.checked_at, dateStr)
     if (delay <= BUFFER_MIN) delayText = 'Đúng giờ'
     else delayText = `+${delay} phút`
   }
@@ -40,18 +40,8 @@ export default function SlotCard({ slot, checkin, dateStr, onToggle, remoteCompa
     ? formatTime(slot.startH, slot.startM)
     : `${formatTime(slot.startH, slot.startM)} – ${slot.endH === 0 && slot.endM === 0 ? '00:00' : formatTime(slot.endH, slot.endM)}`
 
-  // Score for this slot (only calculated and visible when completed)
-  let score = null
-  if (isChecked) {
-    if (delayText === 'Đúng giờ') score = 100
-    else {
-      const checkedMin = new Date(checkin.checked_at).getHours() * 60 + new Date(checkin.checked_at).getMinutes()
-      const delay = checkedMin - slotStartMinutes(slot)
-      score = Math.max(0, 100 - Math.floor(delay / 5) * 10)
-    }
-  } else if (status === 'missed') {
-    score = 0
-  }
+  // Score for this slot (only calculated and visible when completed or missed)
+  const score = getSlotScore(slot, checkin?.checked_at, dateStr, checkin?.status)
 
   const IconComponent = ICON_MAP[slot.icon] || IconWork
 
