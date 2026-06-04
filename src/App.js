@@ -539,165 +539,167 @@ export default function App() {
             <p className="section-subtitle">Thống kê hiệu quả rèn luyện thói quen</p>
           </header>
 
-          {/* SVG COLUMN CHART */}
-          <div className="chart-container">
-            <h3 className="card-subtitle">Hiệu suất 7 ngày qua</h3>
-            
-            {chartDays.length === 0 ? (
-              <p className="no-data-text">Chưa có dữ liệu biểu đồ. Hãy hoàn thành các mục hôm nay!</p>
-            ) : (
-              <div className="svg-wrapper">
-                <svg viewBox="0 0 340 180" className="discipline-svg-chart">
-                  {/* Grid lines */}
-                  <line x1="30" y1="20" x2="330" y2="20" stroke="rgba(255,255,255,0.04)" strokeDasharray="3,3" />
-                  <line x1="30" y1="80" x2="330" y2="80" stroke="rgba(255,255,255,0.04)" strokeDasharray="3,3" />
-                  <line x1="30" y1="140" x2="330" y2="140" stroke="rgba(255,255,255,0.05)" />
-                  
-                  {/* Left axes labels */}
-                  <text x="22" y="24" fill="#64748b" fontSize="8" textAnchor="end">100%</text>
-                  <text x="22" y="84" fill="#64748b" fontSize="8" textAnchor="end">50%</text>
-                  <text x="22" y="144" fill="#64748b" fontSize="8" textAnchor="end">0%</text>
-
-                  {/* Gradient definition */}
-                  <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10b981" />
-                      <stop offset="100%" stopColor="#06b6d4" />
-                    </linearGradient>
-                    <linearGradient id="todayGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#ec4899" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Columns */}
-                  {chartDays.map((d, index) => {
-                    const dayScore = calcDayScore(SLOTS, d.checkins)
-                    const isCurrent = d.date === today
+          <div className="analytics-scroll-container">
+            {/* SVG COLUMN CHART */}
+            <div className="chart-container">
+              <h3 className="card-subtitle">Hiệu suất 7 ngày qua</h3>
+              
+              {chartDays.length === 0 ? (
+                <p className="no-data-text">Chưa có dữ liệu biểu đồ. Hãy hoàn thành các mục hôm nay!</p>
+              ) : (
+                <div className="svg-wrapper">
+                  <svg viewBox="0 0 340 180" className="discipline-svg-chart">
+                    {/* Grid lines */}
+                    <line x1="30" y1="20" x2="330" y2="20" stroke="rgba(255,255,255,0.04)" strokeDasharray="3,3" />
+                    <line x1="30" y1="80" x2="330" y2="80" stroke="rgba(255,255,255,0.04)" strokeDasharray="3,3" />
+                    <line x1="30" y1="140" x2="330" y2="140" stroke="rgba(255,255,255,0.05)" />
                     
-                    // x positioning: starts at 40, spaced by 42px
-                    const x = 40 + index * 42
-                    // Height calculation: max height is 120px (from y=20 to y=140)
-                    const height = Math.max(4, Math.round((dayScore / 100) * 120))
-                    const y = 140 - height
+                    {/* Left axes labels */}
+                    <text x="22" y="24" fill="#64748b" fontSize="8" textAnchor="end">100%</text>
+                    <text x="22" y="84" fill="#64748b" fontSize="8" textAnchor="end">50%</text>
+                    <text x="22" y="144" fill="#64748b" fontSize="8" textAnchor="end">0%</text>
 
-                    return (
-                      <g key={d.date} className="chart-bar-group">
-                        {/* Interactive glow backing */}
-                        {dayScore > 0 && (
+                    {/* Gradient definition */}
+                    <defs>
+                      <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#06b6d4" />
+                      </linearGradient>
+                      <linearGradient id="todayGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" />
+                        <stop offset="100%" stopColor="#ec4899" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Columns */}
+                    {chartDays.map((d, index) => {
+                      const dayScore = calcDayScore(SLOTS, d.checkins)
+                      const isCurrent = d.date === today
+                      
+                      // x positioning: starts at 40, spaced by 42px
+                      const x = 40 + index * 42
+                      // Height calculation: max height is 120px (from y=20 to y=140)
+                      const height = Math.max(4, Math.round((dayScore / 100) * 120))
+                      const y = 140 - height
+
+                      return (
+                        <g key={d.date} className="chart-bar-group">
+                          {/* Interactive glow backing */}
+                          {dayScore > 0 && (
+                            <rect 
+                              x={x} 
+                              y={y} 
+                              width="20" 
+                              height={height} 
+                              rx="5" 
+                              fill={isCurrent ? "url(#todayGradient)" : "url(#barGradient)"} 
+                              opacity="0.15" 
+                              filter="blur(4px)"
+                            />
+                          )}
+                          {/* Core column rect */}
                           <rect 
                             x={x} 
                             y={y} 
                             width="20" 
                             height={height} 
                             rx="5" 
-                            fill={isCurrent ? "url(#todayGradient)" : "url(#barGradient)"} 
-                            opacity="0.15" 
-                            filter="blur(4px)"
+                            fill={isCurrent ? "url(#todayGradient)" : "url(#barGradient)"}
+                            className="chart-rect"
                           />
-                        )}
-                        {/* Core column rect */}
-                        <rect 
-                          x={x} 
-                          y={y} 
-                          width="20" 
-                          height={height} 
-                          rx="5" 
-                          fill={isCurrent ? "url(#todayGradient)" : "url(#barGradient)"}
-                          className="chart-rect"
-                        />
-                        {/* Score Text above column */}
-                        <text 
-                          x={x + 10} 
-                          y={y - 6} 
-                          fill={isCurrent ? "#a5b4fc" : "#cbd5e1"} 
-                          fontSize="9" 
-                          fontWeight="700" 
-                          textAnchor="middle"
-                        >
-                          {dayScore}%
-                        </text>
-                        {/* Day label */}
-                        <text 
-                          x={x + 10} 
-                          y="158" 
-                          fill={isCurrent ? "#a5b4fc" : "#64748b"} 
-                          fontSize="8" 
-                          fontWeight={isCurrent ? "800" : "500"} 
-                          textAnchor="middle"
-                        >
-                          {isCurrent ? "H.Nay" : formatDateVi(d.date).split(' ')[0]}
-                        </text>
-                      </g>
-                    )
-                  })}
-                </svg>
+                          {/* Score Text above column */}
+                          <text 
+                            x={x + 10} 
+                            y={y - 6} 
+                            fill={isCurrent ? "#a5b4fc" : "#cbd5e1"} 
+                            fontSize="9" 
+                            fontWeight="700" 
+                            textAnchor="middle"
+                          >
+                            {dayScore}%
+                          </text>
+                          {/* Day label */}
+                          <text 
+                            x={x + 10} 
+                            y="158" 
+                            fill={isCurrent ? "#a5b4fc" : "#64748b"} 
+                            fontSize="8" 
+                            fontWeight={isCurrent ? "800" : "500"} 
+                            textAnchor="middle"
+                          >
+                            {isCurrent ? "H.Nay" : formatDateVi(d.date).split(' ')[0]}
+                          </text>
+                        </g>
+                      )
+                    })}
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            {/* HABIT QUALITY CLASSIFICATION */}
+            <div className="habit-intelligence">
+              
+              {/* BEST HABITS PANEL */}
+              <div className="habit-card best">
+                <h3 className="card-subtitle success">🏆 Kỷ luật tốt nhất (≥ 70%)</h3>
+                {bestHabits.length === 0 ? (
+                  <p className="no-data-text mini">Thực hiện kỷ luật đúng giờ liên tục để xếp hạng tại đây.</p>
+                ) : (
+                  <div className="habit-list">
+                    {bestHabits.map(habit => {
+                      const HabitIcon = ICON_MAP[habit.icon] || IconWork
+                      return (
+                        <div key={habit.id} className="habit-item">
+                          <span className="habit-icon-wrap">
+                            <HabitIcon className="habit-icon-svg" />
+                          </span>
+                          <div className="habit-detail">
+                            <div className="habit-name">{habit.label}</div>
+                            <div className="habit-stats">
+                              Đúng giờ: {habit.onTimeCount}L {habit.lateCount > 0 && `· Trễ: ${habit.lateCount}L`}
+                            </div>
+                          </div>
+                          <div className="habit-rate success">{habit.completionRate}%</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* HABIT QUALITY CLASSIFICATION */}
-          <div className="habit-intelligence">
-            
-            {/* BEST HABITS PANEL */}
-            <div className="habit-card best">
-              <h3 className="card-subtitle success">🏆 Kỷ luật tốt nhất (≥ 70%)</h3>
-              {bestHabits.length === 0 ? (
-                <p className="no-data-text mini">Thực hiện kỷ luật đúng giờ liên tục để xếp hạng tại đây.</p>
-              ) : (
-                <div className="habit-list">
-                  {bestHabits.map(habit => {
-                    const HabitIcon = ICON_MAP[habit.icon] || IconWork
-                    return (
-                      <div key={habit.id} className="habit-item">
-                        <span className="habit-icon-wrap">
-                          <HabitIcon className="habit-icon-svg" />
-                        </span>
-                        <div className="habit-detail">
-                          <div className="habit-name">{habit.label}</div>
-                          <div className="habit-stats">
-                            Đúng giờ: {habit.onTimeCount}L {habit.lateCount > 0 && `· Trễ: ${habit.lateCount}L`}
+              {/* NEEDS IMPROVEMENT PANEL */}
+              <div className="habit-card improve">
+                <h3 className="card-subtitle warning">⚠️ Cần cải thiện (&lt; 70%)</h3>
+                {badHabits.length === 0 ? (
+                  <p className="no-data-text mini">Quá xuất sắc! Bạn không có thói quen nào cần cải thiện.</p>
+                ) : (
+                  <div className="habit-list">
+                    {badHabits.map(habit => {
+                      const HabitIcon = ICON_MAP[habit.icon] || IconWork
+                      return (
+                        <div key={habit.id} className="habit-item">
+                          <span className="habit-icon-wrap">
+                            <HabitIcon className="habit-icon-svg" />
+                          </span>
+                          <div className="habit-detail">
+                            <div className="habit-name">{habit.label}</div>
+                            <div className="habit-stats">
+                              {habit.evaluatedDays > 0 
+                                ? `Đã làm: ${habit.completedCount}L · Bỏ lỡ: ${habit.missedCount}L`
+                                : 'Chưa từng check-in trong tuần này'
+                              }
+                            </div>
                           </div>
+                          <div className="habit-rate warning">{habit.completionRate}%</div>
                         </div>
-                        <div className="habit-rate success">{habit.completionRate}%</div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
 
-            {/* NEEDS IMPROVEMENT PANEL */}
-            <div className="habit-card improve">
-              <h3 className="card-subtitle warning">⚠️ Cần cải thiện (&lt; 70%)</h3>
-              {badHabits.length === 0 ? (
-                <p className="no-data-text mini">Quá xuất sắc! Bạn không có thói quen nào cần cải thiện.</p>
-              ) : (
-                <div className="habit-list">
-                  {badHabits.map(habit => {
-                    const HabitIcon = ICON_MAP[habit.icon] || IconWork
-                    return (
-                      <div key={habit.id} className="habit-item">
-                        <span className="habit-icon-wrap">
-                          <HabitIcon className="habit-icon-svg" />
-                        </span>
-                        <div className="habit-detail">
-                          <div className="habit-name">{habit.label}</div>
-                          <div className="habit-stats">
-                            {habit.evaluatedDays > 0 
-                              ? `Đã làm: ${habit.completedCount}L · Bỏ lỡ: ${habit.missedCount}L`
-                              : 'Chưa từng check-in trong tuần này'
-                            }
-                          </div>
-                        </div>
-                        <div className="habit-rate warning">{habit.completionRate}%</div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
             </div>
-
           </div>
         </div>
 

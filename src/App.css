@@ -1067,23 +1067,105 @@ body {
 
 /* DESKTOP VIEW (min-width: 992px) - SIDE BY SIDE DUAL COLUMNS */
 @media (min-width: 992px) {
+  body {
+    overflow: hidden;
+  }
+
   .app-container {
-    padding: 3rem 2rem;
+    height: 100vh;
+    padding: 1.5rem 2rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .app-layout-wrapper {
-    max-width: 1060px;
+    max-width: 1200px;
     width: 100%;
+    height: calc(100vh - 3rem);
     display: grid;
     grid-template-columns: 1.05fr 1fr; /* Two columns side-by-side */
-    gap: 2rem;
-    align-items: flex-start;
+    gap: 1.5rem;
+    align-items: stretch;
   }
 
   .app-card {
-    height: auto;
-    min-height: 500px;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    padding: 1.25rem;
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Left Column: Timeline scroll container */
+  .column-timeline {
+    overflow: hidden;
+  }
+  
+  .column-timeline .slots-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* Right Column: Analytics scroll container */
+  .column-analytics {
+    overflow: hidden;
+  }
+  
+  .analytics-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-right: 4px;
+  }
+
+  /* Side-by-side habits layout on desktop */
+  .habit-intelligence {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .habit-card {
+    flex: 1;
+    min-width: 0;
+    padding: 0.75rem 1rem;
+  }
+  
+  .habit-list {
+    gap: 6px;
+  }
+  
+  .habit-item {
+    padding: 6px 10px;
+  }
+
+  /* Sleek custom scrollbars */
+  .slots-list::-webkit-scrollbar,
+  .analytics-scroll-container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .slots-list::-webkit-scrollbar-track,
+  .analytics-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .slots-list::-webkit-scrollbar-thumb,
+  .analytics-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+  }
+
+  .slots-list::-webkit-scrollbar-thumb:hover,
+  .analytics-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 
   /* Force both screens visible on desktop */
