@@ -1060,7 +1060,7 @@ body {
     border-right: none;
     background: transparent;
     box-shadow: none;
-    padding: 1.25rem 1rem 2.5rem;
+    padding: 0 1rem 2.5rem;
     gap: 1.25rem;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -1075,9 +1075,19 @@ body {
     display: none !important;
   }
   
-  .app-header {
+  .app-header,
+  .analytics-header {
+    position: sticky;
+    top: 0;
+    background: rgba(7, 7, 12, 0.85); /* Semi-transparent matching var(--bg-dark) */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 10;
+    padding-top: 1.25rem;
     padding-bottom: 1rem;
     margin-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    width: 100%;
   }
 
   .header-actions {
