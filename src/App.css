@@ -40,6 +40,7 @@ body {
   color: var(--text-primary);
   font-family: 'Plus Jakarta Sans', sans-serif;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -48,6 +49,7 @@ body {
 .app-container {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -65,6 +67,8 @@ body {
   z-index: -1;
   opacity: 0.45;
   pointer-events: none;
+  transform: translate3d(0, 0, 0); /* Force GPU acceleration */
+  will-change: transform;
 }
 
 .blob-1 {
@@ -962,16 +966,17 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 64px;
-  background: rgba(13, 13, 23, 0.8);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  height: calc(64px + env(safe-area-inset-bottom));
+  background: rgba(13, 13, 23, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.35);
 }
 
 .mobile-nav-item {
@@ -1009,8 +1014,8 @@ body {
 }
 
 .mobile-nav-item.active .nav-icon {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 6px var(--primary));
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px var(--primary));
 }
 
 /* ==========================================================================
@@ -1019,49 +1024,172 @@ body {
 
 /* MOBILE ONLY STATES (max-width: 991px) */
 @media (max-width: 991px) {
+  body {
+    overflow: hidden; /* Hide root viewport scroll on mobile */
+  }
+
+  .app-container {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+  
+  .app-layout-wrapper {
+    flex: 1;
+    height: calc(100vh - 64px - env(safe-area-inset-bottom));
+    height: calc(100dvh - 64px - env(safe-area-inset-bottom));
+    overflow: hidden;
+    max-width: 100%;
+    gap: 0;
+  }
+
+  .app-card {
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border: none;
+    border-left: none;
+    border-right: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 1.25rem 1rem 2.5rem;
+    gap: 1.25rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    animation: none; /* Disable transition animations on mobile for scroll performance */
+  }
+
+  .app-card::-webkit-scrollbar {
+    display: none; /* Hide scrollbar inside app-card on mobile */
+  }
+
   .inactive-mobile {
     display: none !important;
+  }
+  
+  .app-header {
+    padding-bottom: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .clock-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
 /* TABLETS AND PHONES */
 @media (max-width: 480px) {
-  .app-container {
-    padding: 1rem 0.5rem 5rem;
-  }
-  
   .app-card {
-    padding: 1.25rem;
-    border-radius: 20px;
-    gap: 1.25rem;
+    padding: 1rem 0.88rem 2.5rem;
+    gap: 1rem;
   }
   
   .stats-grid {
     gap: 8px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat-card {
+    padding: 0.75rem 0.25rem;
+    border-radius: 12px;
   }
   
   .stat-val {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+  }
+  
+  .stat-lbl {
+    font-size: 0.62rem;
+  }
+
+  .progress-wrap {
+    gap: 4px;
+    margin-bottom: 0.25rem;
+  }
+
+  .date-nav {
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .nav-arrow {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .date-label {
+    font-size: 0.76rem;
+  }
+
+  .company-tag {
+    font-size: 0.66rem;
+    padding: 1px 6px;
+  }
+  
+  .slots-list {
+    gap: 6px;
   }
   
   .slot-card {
-    padding: 12px 14px;
+    padding: 10px 12px;
+    border-radius: 12px;
     gap: 10px;
   }
   
   .slot-icon {
     width: 32px;
     height: 32px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
   .slot-label {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+  }
+
+  .slot-time {
+    font-size: 0.68rem;
+  }
+
+  .slot-badge {
+    font-size: 0.64rem;
+    padding: 2px 6px;
+  }
+
+  .slot-score {
+    font-size: 0.8rem;
+  }
+
+  .slot-delay {
+    font-size: 0.64rem;
+  }
+
+  .habit-card {
+    padding: 1rem 0.88rem;
+    border-radius: 16px;
   }
 
   .habit-item {
-    padding: 8px 10px;
-    gap: 10px;
+    padding: 6px 10px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .habit-name {
+    font-size: 0.78rem;
+  }
+
+  .habit-stats {
+    font-size: 0.64rem;
   }
 }
 
